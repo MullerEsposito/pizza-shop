@@ -7,6 +7,8 @@ import { SuperSEO } from 'react-super-seo'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { Link, useNavigate } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
+import { registerRestaurantService } from '@/api/register-restaurant'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const signUpForm = z.object({
@@ -26,15 +28,17 @@ export function SignUp() {
   } = useForm<SignUpForm>()
   const navigate = useNavigate()
 
-  const handleSignUpForm = async (data: SignUpForm) => {
-    console.log(data)
+  const { mutateAsync: registerRestaurantServiceMutated } = useMutation({
+    mutationFn: registerRestaurantService,
+  })
 
+  const handleSignUpForm = async (data: SignUpForm) => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await registerRestaurantServiceMutated(data)
       toast.success('Restaurante cadastrado com sucesso!', {
         action: {
           label: 'Login',
-          onClick: () => navigate('/sign-in'),
+          onClick: () => navigate(`/sign-in?email=${data.email}`),
         },
       })
     } catch {
