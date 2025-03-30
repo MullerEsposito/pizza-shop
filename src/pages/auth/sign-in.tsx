@@ -5,7 +5,9 @@ import { useForm } from 'react-hook-form'
 import { SuperSEO } from 'react-super-seo'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
+import { signInService } from '@/api/sign-in'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const signInForm = z.object({
@@ -15,17 +17,22 @@ const signInForm = z.object({
 type SignInForm = z.infer<typeof signInForm>
 
 export function SignIn() {
+  const [searchParams] = useSearchParams()
   const {
     register,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<SignInForm>()
+  } = useForm<SignInForm>({
+    defaultValues: { email: searchParams.get('email') || '' },
+  })
+
+  const { mutateAsync: signInServiceMutated } = useMutation({
+    mutationFn: signInService,
+  })
 
   const handleSignInForm = async (data: SignInForm) => {
-    console.log(data)
-
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await signInServiceMutated({ email: data.email })
       toast.success('Enviaremos um link de autenticação para o seu e-mail!', {
         action: {
           label: 'Reenviar',
