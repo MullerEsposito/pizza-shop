@@ -3,6 +3,7 @@ version: '3.7'
 services:
   postgres:
     image: bitnami/postgresql:latest
+    user: root
     ports:
       - '5432:5432'
     environment:
