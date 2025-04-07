@@ -1,9 +1,16 @@
-version: '3.7'
-
 services:
+  api:
+    image: oven/bun:latest
+    working_dir: /pizzashop-api
+    volumes:
+      - .:/pizzashop-api
+    command: sh ./entrypoint.sh
+    ports:
+      - '3333:3333'
+    depends_on:
+      - postgres
   postgres:
     image: bitnami/postgresql:latest
-    user: root
     ports:
       - '5432:5432'
     environment:
