@@ -6,6 +6,7 @@ interface PaginationProps {
   currentPage: number
   totalPages: number
   perPage: number
+  onPageChange: (pageIndex: number) => Promise<void> | void
 }
 
 export function Pagination(props: PaginationProps) {
@@ -21,19 +22,39 @@ export function Pagination(props: PaginationProps) {
           Página {props.currentPage + 1} de {pages}
         </span>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="h-8 w-8 p-0">
+          <Button
+            onClick={() => props.onPageChange(0)}
+            variant="outline"
+            className="h-8 w-8 p-0"
+            disabled={props.currentPage <= 1}
+          >
             <ChevronsLeft className="h-4 w-4" />
             <span className="sr-only">Primeira Página</span>
           </Button>
-          <Button variant="outline" className="h-8 w-8 p-0">
+          <Button
+            onClick={() => props.onPageChange(props.currentPage - 1)}
+            variant="outline"
+            className="h-8 w-8 p-0"
+            disabled={props.currentPage === 0}
+          >
             <ChevronLeft className="h-4 w-4" />
             <span className="sr-only">Página Anterior</span>
           </Button>
-          <Button variant="outline" className="h-8 w-8 p-0">
+          <Button
+            onClick={() => props.onPageChange(props.currentPage + 1)}
+            variant="outline"
+            className="h-8 w-8 p-0"
+            disabled={props.currentPage >= pages - 1}
+          >
             <ChevronRight className="h-4 w-4" />
             <span className="sr-only">Próxima Página</span>
           </Button>
-          <Button variant="outline" className="h-8 w-8 p-0">
+          <Button
+            onClick={() => props.onPageChange(pages - 1)}
+            variant="outline"
+            className="h-8 w-8 p-0"
+            disabled={props.currentPage >= pages - 2}
+          >
             <ChevronsRight className="h-4 w-4" />
             <span className="sr-only">Última Página</span>
           </Button>
