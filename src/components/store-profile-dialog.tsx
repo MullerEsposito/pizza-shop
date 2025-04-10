@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 
 const storeProfileSchema = z.object({
   name: z.string().min(1),
-  description: z.string().min(1),
+  description: z.string().min(1).nullable(),
 })
 
 type StoreProfileSchema = z.infer<typeof storeProfileSchema>
@@ -41,25 +41,37 @@ export function StoreProfileDialog() {
 
   const { mutateAsync: updateProfileFn } = useMutation({
     mutationFn: updateProfile,
-    onSuccess(_, { name, description }) {
-      const cached = queryClient.getQueryData<GetManagedRestaurantServiceResponse>(['managed-restaurant'])
+    onMutate({ name, description }) {
+      const { cached } = updateManagedRestaurantCache({ name, description })
 
-      if (cached) {
-        queryClient.setQueryData<GetManagedRestaurantServiceResponse>(
-          ['managed-restaurant'],
-          {
-            ...cached,
-            name,
-            description,
-          })
+      return { previousProfile: cached }
+    },
+    onError(_, __, context) {
+      if (context?.previousProfile) {
+        updateManagedRestaurantCache(context.previousProfile)
       }
     },
-
   })
 
-  const handleUpdateProfile = (data: StoreProfileSchema) => {
+  const updateManagedRestaurantCache = ({ name, description }: StoreProfileSchema) => {
+    const cached = queryClient.getQueryData<GetManagedRestaurantServiceResponse>(['managed-restaurant'])
+
+    if (cached) {
+      queryClient.setQueryData<GetManagedRestaurantServiceResponse>(
+        ['managed-restaurant'],
+        {
+          ...cached,
+          name,
+          description,
+        })
+    }
+
+    return { cached }
+  }
+
+  const handleUpdateProfile = async (data: StoreProfileSchema) => {
     try {
-      updateProfileFn(data)
+      await updateProfileFn(data)
 
       toast.success('Perfil atualizado com sucesso!')
     } catch {
