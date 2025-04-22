@@ -3,8 +3,40 @@ import { SuperSEO } from "react-super-seo";
 import { OrderTableRow } from "./order-table-row";
 import { OrderTableFilters } from "./order-table-filters";
 import { Pagination } from "@/components/pagination";
+import { useQuery } from "@tanstack/react-query";
+import { getOrders } from "@/api/get-orders";
+import { z } from "zod";
+import { useSearchParams } from "react-router-dom";
 
 export function Orders() {
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const orderId = searchParams.get('orderId')
+  const customerName = searchParams.get('customerName')
+  const status = searchParams.get('status')
+
+  const pageIndex = z.coerce
+    .number()
+    .transform(page => page - 1)
+    .parse(searchParams.get('page') ?? 1)
+
+  const { data: result } = useQuery({
+    queryKey: ['orders', pageIndex, orderId, customerName, status],
+    queryFn: () => getOrders({
+      orderId,
+      customerName,
+      pageIndex,
+      status: status === 'all' ? null : status,
+    }),
+  })
+
+  const handlePaginate = (pageIndex: number) => {
+    setSearchParams(state => {
+      state.set('page', (pageIndex + 1).toString())
+
+      return state
+    })
+  }  
   
   return (<>
     <SuperSEO title="Orders | pizza.shop" />
@@ -26,13 +58,20 @@ export function Orders() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array.from({ length: 10 }).map((_, index) => (
-              <OrderTableRow key={index} />
-            ))}
+            {result && result.orders.map(order => 
+              <OrderTableRow key={order.orderId} order={order} />
+            )}
           </TableBody>
         </Table>
       </div>
-      <Pagination currentPage={0} totalPages={105} perPage={10} />
+      {result && (
+        <Pagination
+          onPageChange={handlePaginate}
+          pageIndex={result.meta.pageIndex}
+          totalPages={result.meta.totalCount}
+          perPage={result.meta.perPage}
+        />
+      )}
     </div>
   </>)
 }
