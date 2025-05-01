@@ -91,21 +91,26 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
           <OrderDetails orderId={order.orderId} isOpen={isDetailsOpen} />
         </Dialog>
       </TableCell>
+
       <TableCell className="font-mono text-xs font-medium">
         { order.orderId } 
       </TableCell>
+
       <TableCell className="text-muted-foreground">
         {formatDistanceToNow(order.createdAt, {
           locale: ptBR,
           addSuffix: true,
         })}
       </TableCell>
+
       <TableCell>
         <OrderStatus status={order.status} />
       </TableCell>
+
       <TableCell className="font-medium">
         {order.customerName}
       </TableCell>
+
       <TableCell className="font-medium">
         {(order.total / 100).toLocaleString('pt-BR', {
           style: 'currency',
@@ -154,6 +159,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
           </Button>
         </TableCell>
       )}
+      
       <TableCell>
         <Button
           onClick={() => cancelOrderFn({ orderId: order.orderId })}
