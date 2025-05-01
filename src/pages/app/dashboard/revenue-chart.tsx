@@ -10,16 +10,6 @@ import { DateRange } from 'react-day-picker'
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import colors from 'tailwindcss/colors'
 
-const data = [
-  { date: '10/12', revenue: 1200 },
-  { date: '11/12', revenue: 800 },
-  { date: '12/12', revenue: 900 },
-  { date: '13/12', revenue: 400 },
-  { date: '14/12', revenue: 2300 },
-  { date: '15/12', revenue: 800 },
-  { date: '16/12', revenue: 640 },
-]
-
 export function RevenueChart() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 7),
