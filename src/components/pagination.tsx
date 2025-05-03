@@ -11,6 +11,8 @@ interface PaginationProps {
 
 export function Pagination(props: PaginationProps) {
   const pages = Math.ceil(props.totalPages / props.perPage) || 1
+  
+  const currentPage = props.pageIndex + 1
 
   return (
     <div className="flex justify-between items-center">
@@ -26,7 +28,7 @@ export function Pagination(props: PaginationProps) {
             onClick={ () => props.onPageChange(0)}
             variant="outline"
             className="h-8 w-8 p-0"
-            disabled={props.pageIndex > 1}
+            disabled={currentPage <= 2}
           >
             <ChevronsLeft className="h-4 w-4" />
             <span className="sr-only">Primeira Página</span>
@@ -35,7 +37,7 @@ export function Pagination(props: PaginationProps) {
             onClick={() => props.onPageChange(props.pageIndex - 1)}
             variant="outline"
             className="h-8 w-8 p-0"
-            disabled={props.pageIndex === 0}
+            disabled={currentPage === 1}
           >
             <ChevronLeft className="h-4 w-4" />
             <span className="sr-only">Página Anterior</span>
@@ -44,7 +46,7 @@ export function Pagination(props: PaginationProps) {
             onClick={() => props.onPageChange(props.pageIndex + 1)}
             variant="outline"
             className="h-8 w-8 p-0"
-            disabled={props.pageIndex === pages - 1}
+            disabled={currentPage === pages}
           >
             <ChevronRight className="h-4 w-4" />
             <span className="sr-only">Próxima Página</span>
@@ -53,7 +55,7 @@ export function Pagination(props: PaginationProps) {
             onClick={() => props.onPageChange(pages - 1)}
             variant="outline"
             className="h-8 w-8 p-0"
-            disabled={props.pageIndex < pages - 2}
+            disabled={currentPage >= pages - 1}
           >
             <ChevronsRight className="h-4 w-4" />
             <span className="sr-only">Última Página</span>
