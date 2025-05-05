@@ -6,7 +6,7 @@ export async function getMonthRevenue() {
     return response.data
 }
 
-interface GetMonthRevenueResponse {
+export interface GetMonthRevenueResponse {
     receipt: number
     diffFromLastMonth: number
 }
