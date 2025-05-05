@@ -1,33 +1,28 @@
-/* eslint-disable promise/param-names */
-// src/utils/wait-for-db.ts
 import { Client } from 'pg'
+import { setTimeout } from 'timers/promises'
 
-const config = {
-  host: process.env.POSTGRES_HOST || 'postgres',
-  user: process.env.POSTGRES_USER || 'docker',
-  password: process.env.POSTGRES_PASSWORD || 'docker',
-  database: process.env.POSTGRES_DB || 'pizzashop',
-  port: 5432,
-}
+console.log('⏳ Aguardando PostgreSQL subir...')
 
-const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
+const MAX_RETRIES = 10
 
-async function waitForPostgres(retries = 20) {
-  while (retries > 0) {
-    try {
-      const client = new Client(config)
-      await client.connect()
-      await client.end()
-      console.log('✅ PostgreSQL está pronto!')
-      return
-    } catch (err) {
-      console.log('⏳ Aguardando PostgreSQL subir...')
-      retries--
-      await sleep(2000)
+for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+  try {
+    const client = new Client({
+      connectionString: process.env.DB_URL,
+    })
+
+    await client.connect()
+    await client.end()
+
+    console.log('✅ PostgreSQL está pronto!')
+    break
+  } catch (err) {
+    console.log(`❌ Tentativa ${attempt} falhou, tentando novamente em 2s...`)
+    if (attempt === MAX_RETRIES) {
+      console.error('🛑 Não foi possível conectar ao PostgreSQL')
+      process.exit(1)
     }
-  }
-  console.error('❌ PostgreSQL não respondeu a tempo. Abortando.')
-  process.exit(1)
-}
 
-waitForPostgres()
+    await setTimeout(2000)
+  }
+}

@@ -7,6 +7,7 @@ interface PaginationProps {
   totalPages: number
   perPage: number
   onPageChange: (pageIndex: number) => Promise<void> | void
+  onPageChange: (pageIndex: number) => Promise<void> | void
 }
 
 export function Pagination(props: PaginationProps) {

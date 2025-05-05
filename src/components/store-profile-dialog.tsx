@@ -7,22 +7,24 @@ import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
 import { useForm } from 'react-hook-form'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { getManagedRestaurantService } from '@/api/get-managed-restaurant'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getManagedRestaurantService, GetManagedRestaurantServiceResponse } from '@/api/get-managed-restaurant'
 import { updateProfile } from '@/api/update-profile'
 import { toast } from 'sonner'
 
 const storeProfileSchema = z.object({
   name: z.string().min(1),
-  description: z.string().min(1),
+  description: z.string().min(1).nullable(),
 })
 
 type StoreProfileSchema = z.infer<typeof storeProfileSchema>
 
 export function StoreProfileDialog() {
+  const queryClient = useQueryClient()
   const { data: managedRestaurant } = useQuery({
     queryKey: ['managed-restaurant'],
     queryFn: getManagedRestaurantService,
+    staleTime: Infinity,
   })
 
   const {
@@ -39,12 +41,37 @@ export function StoreProfileDialog() {
 
   const { mutateAsync: updateProfileFn } = useMutation({
     mutationFn: updateProfile,
+    onMutate({ name, description }) {
+      const { cached } = updateManagedRestaurantCache({ name, description })
 
+      return { previousProfile: cached }
+    },
+    onError(_, __, context) {
+      if (context?.previousProfile) {
+        updateManagedRestaurantCache(context.previousProfile)
+      }
+    },
   })
 
-  const handleUpdateProfile = (data: StoreProfileSchema) => {
+  const updateManagedRestaurantCache = ({ name, description }: StoreProfileSchema) => {
+    const cached = queryClient.getQueryData<GetManagedRestaurantServiceResponse>(['managed-restaurant'])
+
+    if (cached) {
+      queryClient.setQueryData<GetManagedRestaurantServiceResponse>(
+        ['managed-restaurant'],
+        {
+          ...cached,
+          name,
+          description,
+        })
+    }
+
+    return { cached }
+  }
+
+  const handleUpdateProfile = async (data: StoreProfileSchema) => {
     try {
-      updateProfileFn(data)
+      await updateProfileFn(data)
 
       toast.success('Perfil atualizado com sucesso!')
     } catch {
