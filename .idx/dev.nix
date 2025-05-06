@@ -6,6 +6,47 @@
   # Use https://search.nixos.org/packages to find packages
   packages = [
     pkgs.nodejs_20
+    pkgs.playwright
+    pkgs.glib
+    pkgs.gtk3
+    pkgs.udev
+    
+    pkgs.alsa-lib
+    pkgs.fontconfig
+    pkgs.freetype
+    pkgs.at-spi2-core
+    pkgs.at-spi2-atk
+    pkgs.dbus
+    pkgs.expat
+
+    # Graphics and rendering libraries
+    pkgs.mesa
+    pkgs.libdrm
+    pkgs.cairo
+    pkgs.pango    
+    pkgs.xorg.libxcb
+    pkgs.xorg.libX11
+    pkgs.xorg.libXcursor
+    pkgs.xorg.libXi
+    pkgs.xorg.libXcomposite
+    pkgs.xorg.libXdamage
+    pkgs.xorg.libXext
+    pkgs.xorg.libXfixes
+    pkgs.xorg.libXrandr
+    pkgs.xorg.libXtst
+    pkgs.xorg.libxshmfence
+    pkgs.libxkbcommon
+    pkgs.gdk-pixbuf-xlib
+    pkgs.gdk-pixbuf
+    
+    # Networking and security
+    pkgs.nss
+    pkgs.nspr
+    pkgs.cups
+    pkgs.openssl
+    pkgs.dbus
+    pkgs.chromium
+    pkgs.libuv
   ];
   # Sets environment variables in the workspace
   env = {};
